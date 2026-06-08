@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Europe 2026 &mdash; Ethan &amp; Ashley</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;background:#F0F4F8;color:#1a1a2e;line-height:1.4}
+.hero{background:linear-gradient(135deg,#1F3864 0%,#2E75B6 100%);color:#fff;padding:32px 24px 0}
+.hero h1{font-size:26px;font-weight:800;letter-spacing:-0.3px;margin-bottom:3px}
+.hero .sub{font-size:13px;opacity:.75;margin-bottom:20px}
+.timeline{display:flex;align-items:center;overflow-x:auto;padding-bottom:16px}
+.tl-stop{display:flex;flex-direction:column;align-items:center;min-width:90px;flex-shrink:0}
+.tl-icon{font-size:22px;margin-bottom:5px}
+.tl-name{font-size:12px;font-weight:700}
+.tl-dates{font-size:10px;opacity:.65;margin-top:2px}
+.tl-line{flex:1;height:2px;background:rgba(255,255,255,.25);min-width:20px;flex-shrink:1}
+.tab-bar{background:#1F3864;display:flex;padding:0 24px;gap:4px;border-bottom:2px solid rgba(255,255,255,.1)}
+.tab-btn{background:none;border:none;color:rgba(255,255,255,.6);font-family:inherit;font-size:14px;font-weight:600;padding:12px 18px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab-btn:hover{color:rgba(255,255,255,.9)}
+.tab-btn.active{color:#fff;border-bottom-color:#fff}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+.wrap{max-width:960px;margin:0 auto;padding:24px 16px}
+.rates-card{background:#fff;border-radius:12px;padding:18px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.rates-card h3{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.rates-row{display:flex;gap:20px;align-items:flex-end;flex-wrap:wrap}
+.rate-group label{display:block;font-size:12px;color:#6b7280;margin-bottom:5px}
+.rate-group input{width:88px;padding:8px 10px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:15px;font-weight:700;color:#1d4ed8;outline:none}
+.rate-group input:focus{border-color:#2E75B6}
+.rates-note{font-size:11px;color:#9ca3af;margin-left:auto;align-self:center}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.card{background:#fff;border-radius:12px;padding:18px 20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.card-label{font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.card-amt{font-size:28px;font-weight:800;letter-spacing:-1px}
+.card-hint{font-size:11px;color:#9ca3af;margin-top:4px}
+.card.confirmed .card-amt{color:#1E7145}
+.card.estimated .card-amt{color:#B45309}
+.card.total{border:2px solid #1F3864}
+.card.total .card-amt{color:#1F3864}
+.viz-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;margin-bottom:20px}
+.viz-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.viz-card h3{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.bar-row{margin-bottom:11px}
+.bar-meta{display:flex;justify-content:space-between;margin-bottom:4px}
+.bar-name{font-size:13px;font-weight:500}
+.bar-val{font-size:13px;color:#6b7280}
+.bar-track{height:8px;background:#F3F4F6;border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .4s ease}
+.warnings{margin-bottom:20px}
+.warn{background:#FFF7ED;border:1px solid #FED7AA;border-left:4px solid #EA580C;border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.warn-title{font-size:13px;font-weight:700;color:#9A3412;margin-bottom:4px}
+.warn-body{font-size:13px;color:#78350F}
+.section-card{background:#fff;border-radius:12px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:15px 20px;cursor:pointer;user-select:none;transition:background .15s}
+.sec-hdr:hover{background:#F9FAFB}
+.sec-left{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700}
+.sec-icon{font-size:18px}
+.sec-right{display:flex;align-items:center;gap:14px}
+.sec-total{font-size:14px;color:#6b7280}
+.chevron{font-size:11px;color:#9ca3af;transition:transform .2s}
+.section-card.open .chevron{transform:rotate(180deg)}
+.sec-body{display:none;border-top:1px solid #F3F4F6}
+.section-card.open .sec-body{display:block}
+.item{display:grid;grid-template-columns:1fr auto;gap:16px;padding:13px 20px;border-bottom:1px solid #FAFAFA;align-items:start}
+.item:last-child{border-bottom:none}
+.item-cat{font-size:13px;font-weight:700;margin-bottom:2px}
+.item-desc{font-size:12px;color:#6b7280;margin-bottom:2px}
+.item-dates{font-size:11px;color:#9ca3af}
+.item-note{font-size:11px;color:#6b7280;font-style:italic;margin-top:4px}
+.item-r{text-align:right;min-width:100px}
+.item-usd{font-size:16px;font-weight:800;margin-bottom:4px}
+.item-local{font-size:11px;color:#9ca3af;margin-bottom:5px}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.2px}
+.b-booked{background:#D1FAE5;color:#065F46}
+.b-found{background:#DBEAFE;color:#1E40AF}
+.b-estimate{background:#FEF3C7;color:#92400E}
+.b-free{background:#F3F4F6;color:#6B7280}
+.toggle-btn{background:#fff;border:1.5px solid #e5e7eb;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:600;color:#374151;cursor:pointer;margin-bottom:16px;transition:all .15s;font-family:inherit}
+.toggle-btn:hover{background:#F9FAFB;border-color:#d1d5db}
+.res-dest{margin-bottom:28px}
+.res-dest-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.res-dest-flag{font-size:22px}
+.res-dest-name{font-size:18px;font-weight:800;color:#1F3864}
+.res-dest-count{font-size:12px;color:#9ca3af;background:#F3F4F6;padding:2px 8px;border-radius:10px;font-weight:600}
+.link-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.link-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;flex-direction:column;gap:10px;transition:box-shadow .15s}
+.link-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.lc-top{display:flex;align-items:flex-start;gap:12px}
+.lc-icon{font-size:24px;flex-shrink:0;margin-top:2px}
+.lc-title{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:3px;line-height:1.3}
+.lc-source{font-size:11px;color:#9ca3af}
+.lc-desc{font-size:13px;color:#4b5563;line-height:1.5}
+.lc-notes{background:#F8F9FA;border-radius:8px;padding:10px 12px;font-size:12px;color:#374151;line-height:1.6}
+.lc-notes strong{color:#1F3864}
+.lc-footer{display:flex;justify-content:space-between;align-items:center;margin-top:4px}
+.lc-tags{display:flex;gap:5px;flex-wrap:wrap}
+.lc-tag{background:#EBF3FB;color:#1E40AF;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.lc-visit{display:inline-block;background:#1F3864;color:#fff;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;text-decoration:none;transition:background .15s;white-space:nowrap}
+.lc-visit:hover{background:#2E75B6}
+.price-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.price-table td{padding:4px 8px;border-bottom:1px solid #F3F4F6}
+.price-table td:first-child{color:#4b5563}
+.price-table td:last-child{text-align:right;font-weight:700;color:#1F3864}
+.price-table tr:last-child td{border-bottom:none}
+.link-placeholder{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.06);border:2px dashed #e5e7eb;color:#9ca3af;font-size:13px;display:flex;align-items:center;gap:10px}
+.res-tip{background:#EBF3FB;border-radius:10px;padding:14px 16px;margin-bottom:24px;font-size:13px;color:#1E40AF;display:flex;align-items:flex-start;gap:10px}
+.dest-group{margin-bottom:28px}
+.dest-hdr{display:flex;align-items:center;gap:12px;padding:10px 0 14px;border-bottom:2px solid #E5E7EB;margin-bottom:16px}
+.dest-hdr-icon{font-size:26px}
+.dest-hdr-name{font-size:20px;font-weight:800;color:#1F3864}
+.dest-hdr-dates{font-size:13px;color:#6b7280;margin-left:4px}
+.dest-hdr-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-left:auto;white-space:nowrap}
+.day-card{background:#fff;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden}
+.day-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 12px;gap:10px;flex-wrap:wrap}
+.day-date{font-size:15px;font-weight:800;color:#1F3864}
+.day-dest-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;color:#fff}
+.day-free-badge{font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;display:flex;align-items:center;gap:5px;margin-left:auto}
+.day-body{padding:0 18px 16px}
+.tline-wrap{margin-bottom:14px}
+.tline-label-row{display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:3px}
+.tline-bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:#F3F4F6}
+.tline-seg{height:100%;position:relative}
+.tline-seg:hover{opacity:.85}
+.event-list{display:flex;flex-direction:column;gap:0}
+.event-row{display:flex;gap:12px;padding:7px 0;border-bottom:1px solid #F9FAFB;align-items:flex-start}
+.event-row:last-child{border-bottom:none}
+.event-icon{font-size:15px;flex-shrink:0;margin-top:1px;width:20px;text-align:center}
+.event-time{font-size:11px;color:#9ca3af;white-space:nowrap;min-width:110px;padding-top:2px}
+.event-text{font-size:13px;color:#374151;flex:1}
+.activity-box{background:linear-gradient(135deg,#F0F9FF,#E0F2FE);border-radius:8px;padding:12px 14px;margin-top:10px;border-left:3px solid #0891B2}
+.activity-box-title{font-size:11px;font-weight:700;color:#0891B2;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.activity-item{font-size:12px;color:#0C4A6E;padding:3px 0;display:flex;gap:7px}
+.activity-item::before{content:"→";color:#0891B2;font-weight:700;flex-shrink:0}
+.day-note{font-size:12px;color:#78350F;background:#FFFBEB;border-radius:8px;padding:10px 12px;margin-top:10px;border-left:3px solid #F59E0B;font-style:italic}
+.day-note-warn{font-size:12px;color:#7F1D1D;background:#FEF2F2;border-radius:8px;padding:10px 12px;margin-top:10px;border-left:3px solid #EF4444}
+.tline-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#6b7280}
+.leg-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.footer{text-align:center;padding:28px 0 20px;font-size:12px;color:#9ca3af}
+@media(max-width:640px){
+  .cards{grid-template-columns:1fr 1fr}
+  .card:last-child{grid-column:span 2}
+  .card-amt{font-size:22px}
+  .viz-grid{grid-template-columns:1fr}
+  .hero h1{font-size:22px}
+  .tab-btn{font-size:12px;padding:10px 12px}
+  .event-time{min-width:90px;font-size:10px}
+  .day-hdr{gap:6px}
+}
+</style>
+</head>
+<body>
+<div class="hero">
+  <h1>&#127757; Europe Trip 2026</h1>
+  <p class="sub">September 13 &ndash; 24, 2026 &nbsp;&middot;&nbsp; Ethan &amp; Ashley &nbsp;&middot;&nbsp; Shared via iCloud</p>
+  <div class="timeline">
+    <div class="tl-stop"><div class="tl-icon">&#9992;&#65039;</div><div class="tl-name">Boston</div><div class="tl-dates">Sep 13</div></div>
+    <div class="tl-line"></div>
+    <div class="tl-stop"><div class="tl-icon">&#127969;</div><div class="tl-name">England</div><div class="tl-dates">Sep 14&ndash;16</div></div>
+    <div class="tl-line"></div>
+    <div class="tl-stop"><div class="tl-icon">&#127754;</div><div class="tl-name">Malta</div><div class="tl-dates">Sep 16&ndash;20</div></div>
+    <div class="tl-line"></div>
+    <div class="tl-stop"><div class="tl-icon">&#127984;</div><div class="tl-name">Krak&oacute;w</div><div class="tl-dates">Sep 20&ndash;24</div></div>
+    <div class="tl-line"></div>
+    <div class="tl-stop"><div class="tl-icon">&#127968;</div><div class="tl-name">Boston</div><div class="tl-dates">Sep 24</div></div>
+  </div>
+</div>
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('budget',this)">&#128176; Budget</button>
+  <button class="tab-btn" onclick="switchTab('itinerary',this)">&#128197; Itinerary</button>
+  <button class="tab-btn" onclick="switchTab('research',this)">&#128218; Research</button>
+</div>
+
+<div id="tab-budget" class="tab-pane active">
+<div class="wrap">
+  <div class="rates-card">
+    <h3>Exchange Rates &mdash; edit to update all totals instantly</h3>
+    <div class="rates-row">
+      <div class="rate-group"><label>GBP &rarr; USD</label><input type="number" id="gbp" value="1.27" step="0.001" oninput="recalc()"></div>
+      <div class="rate-group"><label>EUR &rarr; USD</label><input type="number" id="eur" value="1.09" step="0.001" oninput="recalc()"></div>
+      <div class="rates-note">Source: xe.com, approx. Jun 2026</div>
+    </div>
+  </div>
+  <div class="cards">
+    <div class="card confirmed"><div class="card-label">Confirmed / Found</div><div class="card-amt" id="c-confirmed">&mdash;</div><div class="card-hint">Booked &amp; priced items</div></div>
+    <div class="card estimated"><div class="card-label">Estimated Costs</div><div class="card-amt" id="c-estimated">&mdash;</div><div class="card-hint">Not yet confirmed</div></div>
+    <div class="card total"><div class="card-label">All-In Estimate</div><div class="card-amt" id="c-total">&mdash;</div><div class="card-hint">For 2 people &middot; 10 nights</div></div>
+  </div>
+  <div class="viz-grid">
+    <div class="viz-card"><h3>Spend by Category</h3><canvas id="chart" width="220" height="220"></canvas></div>
+    <div class="viz-card"><h3>Category Breakdown</h3><div id="bars"></div></div>
+  </div>
+  <div class="warnings">
+    <div class="warn"><div class="warn-title">&#9888;&#65039; Timing Risk: LHR &rarr; LGW Transfer (Sep 16)</div><div class="warn-body">Car drop-off at Heathrow is 3:00 PM. Your Malta flight departs Gatwick at 4:05 PM &mdash; only 65 minutes with a ~45-minute transit between airports. Consider returning the car earlier in the day.</div></div>
+    <div class="warn"><div class="warn-title">&#9888;&#65039; Hotel Stary Krak&oacute;w &mdash; Above Budget</div><div class="warn-body">At &euro;292/night (~$319), Hotel Stary is above the ~$200/night target. Breakfast is included and it&rsquo;s the standout hotel in the Old Town.</div></div>
+    <div class="warn"><div class="warn-title">&#127915; Book Auschwitz Now</div><div class="warn-body">Guided tours fill up months in advance for September. Reserve immediately at auschwitz.org &mdash; free but requires advance registration.</div></div>
+  </div>
+  <button class="toggle-btn" onclick="toggleAll()" id="toggle-all-btn">&#9660; Expand All Sections</button>
+  <div id="sections"></div>
+  <div class="footer">Updated June 2026 &nbsp;&middot;&nbsp; All USD amounts approximate</div>
+</div>
+</div>
+
+<div id="tab-itinerary" class="tab-pane">
+
+<div class="wrap">
+  <div class="tline-legend"><div class="leg-item"><div class="leg-dot" style="background:#2E75B6"></div>Flight</div><div class="leg-item"><div class="leg-dot" style="background:#F59E0B"></div>Ground transport</div><div class="leg-item"><div class="leg-dot" style="background:#9CA3AF"></div>Logistics / wait</div><div class="leg-item"><div class="leg-dot" style="background:#10B981"></div>Free time</div><div class="leg-item"><div class="leg-dot" style="background:#A78BFA"></div>Settle in</div></div>
+  <div class="dest-group"><div class="dest-hdr"><span class="dest-hdr-icon">✈️</span><span class="dest-hdr-name">Departure</span><span class="dest-hdr-dates" style="color:#6B7280">Sep 13</span><span class="dest-hdr-pill" style="background:#6B7280;color:#fff">Departure</span></div><div class="day-card"><div class="day-hdr"><span class="day-date">Sat, Sep 13</span><span class="day-dest-badge" style="background:#6B7280">Departure</span><span class="day-free-badge" style="background:#F3F4F6;color:#6B7280">🔴 Departure day</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:75.0%;background:#10B981" title="Pack &amp; prep (720 min)"></div><div class="tline-seg" style="width:12.5%;background:#9CA3AF" title="Head to BOS + check-in (120 min)"></div><div class="tline-seg" style="width:12.5%;background:#2E75B6" title="BOS → LHR (9:30 PM) (120 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">📦</span><span class="event-time">Daytime</span><span class="event-text">Final packing &amp; prep at home</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">~7:00 PM</span><span class="event-text">Head to Logan Airport (BOS)</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">~7:30 PM</span><span class="event-text">Check in &amp; security at BOS — allow 2 hrs</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">9:30 PM</span><span class="event-text">Depart BOS → LHR (Virgin Atlantic, nonstop, 6h 45m)</span></div></div><div class="day-note">Overnight flight — try to sleep on board. Arrive London 9:15 AM local time.</div></div></div></div><div class="dest-group"><div class="dest-hdr"><span class="dest-hdr-icon">🏡</span><span class="dest-hdr-name">England</span><span class="dest-hdr-dates" style="color:#1E7145">Sep 14–16</span><span class="dest-hdr-pill" style="background:#1E7145;color:#fff">England</span></div><div class="day-card"><div class="day-hdr"><span class="day-date">Sun, Sep 14</span><span class="day-dest-badge" style="background:#1E7145">England</span><span class="day-free-badge" style="background:#D1FAE5;color:#065F46">🟡 ~7 hrs free (from noon)</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:14.1%;background:#2E75B6" title="BOS → LHR landing (135 min)"></div><div class="tline-seg" style="width:7.8%;background:#9CA3AF" title="Immigration + car pickup (75 min)"></div><div class="tline-seg" style="width:9.4%;background:#F59E0B" title="Drive to family (90 min)"></div><div class="tline-seg" style="width:68.8%;background:#10B981" title="Free afternoon (660 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">9:15 AM</span><span class="event-text">Land at LHR (overnight flight arrives)</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">9:15–10:15 AM</span><span class="event-text">Immigration, baggage, Alamo car pickup (~1 hr)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">10:15 AM–Noon</span><span class="event-text">Drive to family (~90 min — varies by location)</span></div><div class="event-row"><span class="event-icon">✅</span><span class="event-time">~Noon onwards</span><span class="event-text">Free time with family (~7 hrs)</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Keep it low-key — jet lag recovery day</div><div class="activity-item">Afternoon walk, garden, catching up with family</div><div class="activity-item">Pub dinner in the evening</div></div><div class="day-note">You'll be tired from the overnight flight. A gentle afternoon and early night beats ambitious sightseeing.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Mon, Sep 15</span><span class="day-dest-badge" style="background:#1E7145">England</span><span class="day-free-badge" style="background:#D1FAE5;color:#065F46">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day with family (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — completely free</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Day trip to a nearby town, castle, or market</div><div class="activity-item">Walk or hike in the countryside</div><div class="activity-item">Lunch at a local pub</div><div class="activity-item">Ask the family — they'll know the best spots nearby</div></div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Tue, Sep 16</span><span class="day-dest-badge" style="background:#D97706">England → Malta</span><span class="day-free-badge" style="background:#FEF3C7;color:#92400E">🟡 ~4 hrs free (morning only)</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:31.2%;background:#10B981" title="Free morning (300 min)"></div><div class="tline-seg" style="width:6.2%;background:#F59E0B" title="Drive to LHR (60 min)"></div><div class="tline-seg" style="width:12.5%;background:#9CA3AF" title="Car return + LHR wait (120 min)"></div><div class="tline-seg" style="width:6.8%;background:#F59E0B" title="⚠ LHR→LGW shuttle (65 min)"></div><div class="tline-seg" style="width:26.6%;background:#2E75B6" title="LGW → MLA (255 min)"></div><div class="tline-seg" style="width:4.2%;background:#F59E0B" title="Taxi to hotel (40 min)"></div><div class="tline-seg" style="width:12.5%;background:#A78BFA" title="Check in + settle (120 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">7:00 AM–Noon</span><span class="event-text">Free morning with family (~4–5 hrs)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">~Noon</span><span class="event-text">Drive back to LHR to return car (allow ~1 hr)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">3:00 PM</span><span class="event-text">Return car at Alamo LHR (drop-off deadline)</span></div><div class="event-row"><span class="event-icon">⚠️</span><span class="event-time">3:00–4:00 PM</span><span class="event-text">⚠ Shuttle LHR → LGW (~45 min) — VERY TIGHT for 4:05 PM flight</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">4:05 PM</span><span class="event-text">Depart LGW → MLA (BA Euroflyer, nonstop, 3h 15m)</span></div><div class="event-row"><span class="event-icon">🌊</span><span class="event-time">8:20 PM</span><span class="event-text">Arrive Malta (MLA)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">8:20–9:00 PM</span><span class="event-text">Taxi MLA → Number 11, St. Julian's (~20–30 min, ~€20)</span></div><div class="event-row"><span class="event-icon">🏨</span><span class="event-time">~9:00 PM</span><span class="event-text">Check in · late dinner nearby</span></div></div><div class="day-note-warn">⚠ The LHR car return (3 PM) and LGW departure (4:05 PM) are dangerously close. Plan to leave the family home by 11:30 AM at the latest, and return the car no later than 2:30 PM. Consider returning it even earlier if you want breathing room.</div></div></div></div><div class="dest-group"><div class="dest-hdr"><span class="dest-hdr-icon">🌊</span><span class="dest-hdr-name">Malta</span><span class="dest-hdr-dates" style="color:#0891B2">Sep 17–20</span><span class="dest-hdr-pill" style="background:#0891B2;color:#fff">Malta</span></div><div class="day-card"><div class="day-hdr"><span class="day-date">Wed, Sep 17</span><span class="day-dest-badge" style="background:#0891B2">Malta</span><span class="day-free-badge" style="background:#CFFAFE;color:#164E63">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Malta (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Malta</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Valletta (full day) — St. John's Co-Cathedral, Grandmaster's Palace, Upper Barrakka Gardens</div><div class="activity-item">Catch the bus from St. Julian's (~20 min, €1.50 each way)</div><div class="activity-item">Ħal Saflieni Hypogeum — book your slot now at heritagemalta.mt (very limited tickets)</div></div><div class="day-note">Suggested: Valletta day. The Cathedral alone is worth the trip — Caravaggio's largest painting is here.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Thu, Sep 18</span><span class="day-dest-badge" style="background:#0891B2">Malta</span><span class="day-free-badge" style="background:#CFFAFE;color:#164E63">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Malta (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Malta</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Day trip to Gozo (full day) — take the early ferry from Ċirkewwa (~25 min, ~€5 return)</div><div class="activity-item">Ġgantija Temples (older than Stonehenge) + Victoria Citadel</div><div class="activity-item">Xlendi Bay or Mġarr ix-Xini for diving / snorkeling with Atlantis Gozo</div></div><div class="day-note">Suggested: Gozo day trip. Arguably the highlight of the Malta leg — go early, stay late.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Fri, Sep 19</span><span class="day-dest-badge" style="background:#0891B2">Malta</span><span class="day-free-badge" style="background:#CFFAFE;color:#164E63">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Malta (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Malta</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">South coast: Ħaġar Qim &amp; Mnajdra temples (half-day) + Blue Grotto boat trip (~€8/person)</div><div class="activity-item">Mdina (Silent City) — medieval fortified hill town, magical in late afternoon</div><div class="activity-item">Or: diving near St. Julian's + beach day / last swim</div></div><div class="day-note">Suggested: temples + Blue Grotto in the morning, Mdina in the afternoon. Last evening in Malta — dinner somewhere special.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Sat, Sep 20</span><span class="day-dest-badge" style="background:#D97706">Malta → Kraków</span><span class="day-free-badge" style="background:#FEF3C7;color:#92400E">🟢 ~9 hrs split (6 morning + 3 evening)</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:37.5%;background:#10B981" title="Free morning, Malta (360 min)"></div><div class="tline-seg" style="width:14.1%;background:#9CA3AF" title="Checkout + to airport (135 min)"></div><div class="tline-seg" style="width:16.1%;background:#2E75B6" title="MLA → KRK (155 min)"></div><div class="tline-seg" style="width:4.2%;background:#F59E0B" title="Taxi to hotel (40 min)"></div><div class="tline-seg" style="width:28.1%;background:#10B981" title="Free evening, Kraków (270 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">7:00 AM–1:00 PM</span><span class="event-text">Free morning in Malta (~6 hrs)</span></div><div class="event-row"><span class="event-icon">🏨</span><span class="event-time">~11:00 AM</span><span class="event-text">Check out of Number 11 (store bags at hotel if helpful)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">~1:15 PM</span><span class="event-text">Taxi to MLA airport (~20 min, ~€20)</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">1:45–3:15 PM</span><span class="event-text">Check in &amp; security at MLA — Ryanair, allow 90 min</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">3:15 PM</span><span class="event-text">Depart MLA → KRK (Ryanair, nonstop, 2h 35m)</span></div><div class="event-row"><span class="event-icon">🏰</span><span class="event-time">5:50 PM</span><span class="event-text">Arrive Kraków (KRK)</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">5:50–6:30 PM</span><span class="event-text">Taxi KRK airport → Hotel Stary (~15 min, ~€15)</span></div><div class="event-row"><span class="event-icon">🏨</span><span class="event-time">~6:30 PM</span><span class="event-text">Check in to Hotel Stary</span></div><div class="event-row"><span class="event-icon">✅</span><span class="event-time">7:00–11:00 PM</span><span class="event-text">Free evening in Kraków (~3–4 hrs)</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Malta morning: beach, café, last swim, final pastizzi</div><div class="activity-item">Kraków evening: stroll Rynek Główny (Main Square) — one of Europe's largest medieval squares</div><div class="activity-item">Dinner in the Old Town — first taste of Polish food</div></div><div class="day-note">Two free windows split by a flight. Evening in Kraków's Old Town is magical — the square is lit up and full of life.</div></div></div></div><div class="dest-group"><div class="dest-hdr"><span class="dest-hdr-icon">🏰</span><span class="dest-hdr-name">Kraków</span><span class="dest-hdr-dates" style="color:#7C3AED">Sep 21–24</span><span class="dest-hdr-pill" style="background:#7C3AED;color:#fff">Kraków</span></div><div class="day-card"><div class="day-hdr"><span class="day-date">Sun, Sep 21</span><span class="day-dest-badge" style="background:#7C3AED">Kraków</span><span class="day-free-badge" style="background:#EDE9FE;color:#4C1D95">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Kraków (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Kraków</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Wawel Castle &amp; Cathedral (morning, ~2–3 hrs) — book tickets online in advance</div><div class="activity-item">Kazimierz Jewish Quarter (afternoon, free to wander)</div><div class="activity-item">Dinner in Old Town — try a milk bar (Bar Mleczny) for authentic cheap Polish food</div></div><div class="day-note">Suggested: Wawel in the morning (book tickets!), Kazimierz in the afternoon — two very different but equally compelling parts of Kraków.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Mon, Sep 22</span><span class="day-dest-badge" style="background:#7C3AED">Kraków</span><span class="day-free-badge" style="background:#EDE9FE;color:#4C1D95">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Kraków (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Kraków</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Auschwitz-Birkenau guided tour — a full day commitment (~7–8 hrs inc. transport). Book now at auschwitz.org</div><div class="activity-item">OR: Wieliczka Salt Mine (~3–4 hrs, ~30 min from Kraków) + afternoon free</div></div><div class="day-note">Auschwitz is a full-day, emotionally significant experience — give it the time it deserves. Best done with a guide.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Tue, Sep 23</span><span class="day-dest-badge" style="background:#7C3AED">Kraków</span><span class="day-free-badge" style="background:#EDE9FE;color:#4C1D95">🟢 Full day free</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:100.0%;background:#10B981" title="Full day in Kraków (960 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">✅</span><span class="event-time">Full day</span><span class="event-text">No travel commitments — full day in Kraków</span></div></div><div class="activity-box"><div class="activity-box-title">💡 Suggested for this day</div><div class="activity-item">Whatever you didn't do yesterday — Auschwitz or Wieliczka</div><div class="activity-item">Schindler's Factory Museum (WWII history, ~2–3 hrs)</div><div class="activity-item">Last evening: dinner with a view on Rynek Główny — splurge tonight</div></div><div class="day-note">Last full day of the trip. Save your favourite dinner for tonight.</div></div></div><div class="day-card"><div class="day-hdr"><span class="day-date">Wed, Sep 24</span><span class="day-dest-badge" style="background:#6B7280">Kraków → Boston</span><span class="day-free-badge" style="background:#F3F4F6;color:#6B7280">🔴 Full travel day</span></div><div class="day-body"><div class="tline-wrap"><div class="tline-label-row"><span>7 AM</span><span>Noon</span><span>6 PM</span><span>11 PM</span></div><div class="tline-bar"><div class="tline-seg" style="width:4.7%;background:#9CA3AF" title="Wake up + check out (45 min)"></div><div class="tline-seg" style="width:1.6%;background:#F59E0B" title="Taxi to KRK airport (15 min)"></div><div class="tline-seg" style="width:13.0%;background:#9CA3AF" title="KRK check-in &amp; security (125 min)"></div><div class="tline-seg" style="width:9.4%;background:#2E75B6" title="KRK → LTN (90 min)"></div><div class="tline-seg" style="width:12.0%;background:#9CA3AF" title="Immigration + exit LTN (115 min)"></div><div class="tline-seg" style="width:6.2%;background:#F59E0B" title="Coach LTN → LHR (60 min)"></div><div class="tline-seg" style="width:27.6%;background:#9CA3AF" title="LHR check-in + wait (265 min)"></div><div class="tline-seg" style="width:25.5%;background:#2E75B6" title="LHR → BOS (245 min)"></div></div></div><div class="event-list"><div class="event-row"><span class="event-icon">⏰</span><span class="event-time">7:00–7:30 AM</span><span class="event-text">Wake up, finish packing, check out of Hotel Stary</span></div><div class="event-row"><span class="event-icon">🚗</span><span class="event-time">7:30 AM</span><span class="event-text">Taxi to KRK airport (~15 min)</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">8:05 AM</span><span class="event-text">Check in &amp; security at KRK — Ryanair, must arrive 2 hrs early</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">10:05 AM</span><span class="event-text">Depart KRK → LTN (Ryanair, 2h 30m)</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">11:35 AM</span><span class="event-text">Arrive London Luton (LTN)</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">11:35 AM–1:30 PM</span><span class="event-text">Immigration, bags, walk to bus stop at LTN</span></div><div class="event-row"><span class="event-icon">🚌</span><span class="event-time">1:30 PM</span><span class="event-text">National Express coach LTN → LHR T2&amp;T3 (1 hr, £27.50 for 2 — already booked ✓)</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">2:30 PM</span><span class="event-text">Arrive LHR — 4.5 hrs to transatlantic departure</span></div><div class="event-row"><span class="event-icon">⏳</span><span class="event-time">2:30–6:55 PM</span><span class="event-text">LHR check-in, security, lounge/wait (~4.5 hrs — good buffer ✓)</span></div><div class="event-row"><span class="event-icon">✈️</span><span class="event-time">6:55 PM</span><span class="event-text">Depart LHR → BOS (Virgin Atlantic VS11, Boeing 787, 7h 25m)</span></div><div class="event-row"><span class="event-icon">🏠</span><span class="event-time">9:20 PM</span><span class="event-text">Arrive Boston (BOS) — home!</span></div></div><div class="day-note">Full travel day — no free time. Grab a coffee and pastry at KRK airport, and enjoy the VS lounge at LHR if you have access.</div></div></div></div>
+  <div class="footer">Updated June 2026 &nbsp;&middot;&nbsp; Times are approximate &nbsp;&middot;&nbsp; Ethan &amp; Ashley&#39;s Europe Trip 2026</div>
+</div>
+
+</div>
+
+<div id="tab-research" class="tab-pane">
+<div class="wrap">
+  <div class="res-tip">
+    <span style="font-size:18px">&#128204;</span>
+    <div><strong>Your trip research library.</strong> Ask Claude to add any link &mdash; guides, booking sites, reviews, maps &mdash; and it&rsquo;ll appear here.</div>
+  </div>
+  <div class="res-dest">
+    <div class="res-dest-hdr"><span class="res-dest-flag">&#127474;&#127481;</span><span class="res-dest-name">Malta</span><span class="res-dest-count">2 links</span></div>
+    <div class="link-grid">
+      <div class="link-card">
+        <div class="lc-top"><div class="lc-icon">&#128172;</div><div><div class="lc-title">r/malta: Visiting Malta &mdash; Start Here</div><div class="lc-source">reddit.com/r/malta</div></div></div>
+        <div class="lc-desc">Community-curated guide pinned by the r/malta subreddit. Covers transport, SIM cards, beaches, food, safety tips, and FAQs answered by locals and frequent visitors.</div>
+        <div class="lc-footer"><div class="lc-tags"><span class="lc-tag">Malta</span><span class="lc-tag">Guide</span><span class="lc-tag">Community</span></div><a class="lc-visit" href="https://www.reddit.com/r/malta/comments/1k8yh3f/visiting_malta_start_here/" target="_blank">Visit &rarr;</a></div>
+      </div>
+      <div class="link-card">
+        <div class="lc-top"><div class="lc-icon">&#129347;</div><div><div class="lc-title">Atlantis Gozo &mdash; Diving Price List 2026</div><div class="lc-source">atlantisgozo.com &nbsp;&middot;&nbsp; PADI 5-Star IDC Centre</div></div></div>
+        <div class="lc-desc">Top-rated dive centre based in Marsalforn, Gozo. Guided dives, equipment rental, full PADI course range.</div>
+        <div class="lc-notes"><strong>Accompanied Dives (2026)</strong>
+          <table class="price-table">
+            <tr><td>1 dive</td><td>&euro;42</td></tr>
+            <tr><td>4-dive package</td><td>&euro;144 (&euro;36/dive)</td></tr>
+            <tr><td>6-dive package</td><td>&euro;198 (&euro;33/dive)</td></tr>
+            <tr><td>10-dive package</td><td>&euro;300 (&euro;30/dive)</td></tr>
+            <tr><td>+ Boat supplement</td><td>&euro;27.50/dive</td></tr>
+            <tr><td>+ Full gear rental</td><td>&euro;12/dive</td></tr>
+          </table>
+        </div>
+        <div class="lc-footer"><div class="lc-tags"><span class="lc-tag">Malta</span><span class="lc-tag">Gozo</span><span class="lc-tag">Diving</span></div><a class="lc-visit" href="https://www.atlantisgozo.com/diving-pricelist/" target="_blank">Visit &rarr;</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="res-dest">
+    <div class="res-dest-hdr"><span class="res-dest-flag">&#127477;&#127473;</span><span class="res-dest-name">Krak&oacute;w</span><span class="res-dest-count">0 links</span></div>
+    <div class="link-grid"><div class="link-placeholder">&#43; Ask Claude to add Krak&oacute;w guides, Auschwitz booking, Wieliczka info&hellip;</div></div>
+  </div>
+  <div class="res-dest">
+    <div class="res-dest-hdr"><span class="res-dest-flag">&#127988;</span><span class="res-dest-name">England</span><span class="res-dest-count">0 links</span></div>
+    <div class="link-grid"><div class="link-placeholder">&#43; Ask Claude to add links for things to do in the area you&rsquo;re visiting&hellip;</div></div>
+  </div>
+  <div class="res-dest">
+    <div class="res-dest-hdr"><span class="res-dest-flag">&#9992;&#65039;</span><span class="res-dest-name">Logistics &amp; Transport</span><span class="res-dest-count">0 links</span></div>
+    <div class="link-grid"><div class="link-placeholder">&#43; Ask Claude to add booking confirmations, ferry/train links, transfer info&hellip;</div></div>
+  </div>
+  <div class="footer">Updated June 2026 &nbsp;&middot;&nbsp; Ethan &amp; Ashley&#39;s Europe Trip 2026</div>
+</div>
+</div>
+
+<script>
+function switchTab(id,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+const SECTIONS=[
+  {id:'flights',title:'Flights',icon:'✈️',color:'#2E75B6',items:[
+    {cat:'Transatlantic',desc:'BOS → LHR + LHR → BOS (Virgin Atlantic, economy, 2 pax)',dates:'Sep 13 & Sep 24',amount:1548,cur:'USD',status:'Found',note:'Nonstop; 6h 45m outbound, 7h 25m return (VS11 Boeing 787)'},
+    {cat:'Internal (3 legs)',desc:'LGW→MLA (BA Euroflyer), MLA→KRK (Ryanair), KRK→LTN (Ryanair) — 2 pax',dates:'Sep 16, 20 & 24',amount:483,cur:'USD',status:'Found',note:'Bag fees NOT included — see Luggage section below'},
+  ]},
+  {id:'ground',title:'Ground Transport',icon:'🚗',color:'#059669',items:[
+    {cat:'Car Rental England',desc:'Alamo/Costco · Ford Focus · LHR pickup & drop-off',dates:'Sep 14–16',amount:135.73,cur:'GBP',status:'Booked',note:'Automatic; unlimited miles; additional driver included'},
+    {cat:'Coach LTN → LHR',desc:'National Express · 2 pax · Luton → Heathrow T2&T3',dates:'Sep 24',amount:27.50,cur:'GBP',status:'Booked',note:'13:30 dep → 14:30 arr · 4.5 hrs before LHR-BOS ✓'},
+    {cat:'⚠ Transfer LHR→LGW',desc:'Shuttle to Gatwick for Malta flight · 2 pax, ~45 min',dates:'Sep 16',amount:20,cur:'GBP',status:'Estimate',note:'TIMING RISK — see Itinerary tab Sep 16'},
+    {cat:'Malta Local',desc:"MLA airport → St. Julian's + local taxis & buses",dates:'Sep 16–20',amount:65,cur:'EUR',status:'Estimate',note:'~€20 airport taxi; ~€45 local over 4 days'},
+    {cat:'Kraków Local',desc:'KRK airport → Hotel Stary + trams & taxis',dates:'Sep 20–24',amount:50,cur:'EUR',status:'Estimate',note:'~€15 taxi from airport; Old Town is very walkable'},
+  ]},
+  {id:'accom',title:'Accommodation',icon:'🏨',color:'#7C3AED',items:[
+    {cat:'Malta',desc:"Number 11, St. Julian's · Handwritten Collection · 4 nights",dates:'Sep 16–20',amount:684,cur:'USD',status:'Found',note:"$171/night · summer -25% sale · beachside St. Julian's"},
+    {cat:'⚠ Kraków',desc:'Hotel Stary · Double Room · Bed & Breakfast · 4 nights',dates:'Sep 20–24',amount:1169.75,cur:'EUR',status:'Found',note:'€292/night (~$319) — above $200 target; breakfast incl.; 5-star Old Town'},
+    {cat:'England',desc:'Staying with family',dates:'Sep 14–16',amount:0,cur:'USD',status:'Free',note:'No accommodation cost'},
+  ]},
+  {id:'luggage',title:'Luggage Fees',icon:'🧳',color:'#D97706',items:[
+    {cat:'Transatlantic Bags',desc:'Checked bags BOS-LHR + LHR-BOS (2 pax, both ways)',dates:'—',amount:105,cur:'USD',status:'Estimate',note:'~$35–55/bag each way if basic economy; confirm at booking'},
+    {cat:'Internal Flight Bags',desc:'Ryanair ×2 + BA Euroflyer bags (2 pax, 3 legs)',dates:'Sep 16/20/24',amount:120,cur:'USD',status:'Estimate',note:'Buy ahead online — much cheaper than at airport'},
+  ]},
+  {id:'activities',title:'Activities',icon:'🎯',color:'#DC2626',items:[
+    {cat:'Malta · Diving',desc:"4 guided dives (2 each) · Atlantis Gozo 4-dive package",dates:'Sep 17–19',amount:144,cur:'EUR',status:'Estimate',note:'4-dive package €144 + boat €27.50×4=€110 + gear €12×4=€48 if needed'},
+    {cat:'Malta · Sightseeing',desc:'Mdina, Blue Grotto, temples',dates:'Sep 16–20',amount:100,cur:'USD',status:'Estimate',note:'Mix of free & ticketed; temples ~€10/person'},
+    {cat:'Kraków · Auschwitz',desc:'Guided tour · 2 pax (book now!)',dates:'Sep 21–23',amount:80,cur:'USD',status:'Estimate',note:'~$35–40/person at auschwitz.org — reserve months ahead'},
+    {cat:'Kraków · Wieliczka',desc:'Salt Mine entry + guided tour · 2 pax',dates:'Sep 21–23',amount:100,cur:'USD',status:'Estimate',note:'~€50/person; UNESCO site, ~30 min from city'},
+    {cat:'Kraków · Other',desc:"Wawel Castle, Kazimierz, Schindler's Factory, misc.",dates:'Sep 20–24',amount:50,cur:'USD',status:'Estimate',note:'Wawel ~€15/person; Kazimierz is largely free'},
+  ]},
+  {id:'food',title:'Food & Drink',icon:'🍽️',color:'#0891B2',items:[
+    {cat:'England',desc:'2 days · ~$100/day for 2',dates:'Sep 14–16',amount:200,cur:'USD',status:'Estimate',note:'Family meals will likely reduce this'},
+    {cat:'Malta',desc:'4 days · ~$120/day for 2',dates:'Sep 16–20',amount:480,cur:'USD',status:'Estimate',note:'Mediterranean seafood & café culture; pastizzi are a must'},
+    {cat:'Kraków',desc:'4 days · ~$80/day for 2',dates:'Sep 20–24',amount:320,cur:'USD',status:'Estimate',note:'Extremely affordable — pierogi, żurek, zapiekanka'},
+  ]},
+  {id:'misc',title:'Miscellaneous',icon:'📋',color:'#6B7280',items:[
+    {cat:'Travel Insurance',desc:'Multi-country policy · 10 days · 2 pax',dates:'—',amount:225,cur:'USD',status:'Estimate',note:'Strongly recommended; typical $150–300'},
+    {cat:'Souvenirs / Shopping',desc:'Gifts, incidentals',dates:'—',amount:150,cur:'USD',status:'Estimate',note:'Kraków has excellent amber jewellery & artisan craft shops'},
+  ]},
+];
+const gbp=()=>parseFloat(document.getElementById('gbp').value)||1.27;
+const eur=()=>parseFloat(document.getElementById('eur').value)||1.09;
+const toUSD=(a,c)=>c==='GBP'?a*gbp():c==='EUR'?a*eur():a;
+const fmt=n=>n===0?'$0':'$'+Math.round(n).toLocaleString('en-US');
+let chart=null,allOpen=false;
+function badgeClass(s){return{Booked:'b-booked',Found:'b-found',Estimate:'b-estimate',Free:'b-free'}[s]||'b-free';}
+function buildDOM(){
+  const wrap=document.getElementById('sections');
+  wrap.innerHTML='';
+  SECTIONS.forEach(sec=>{
+    const card=document.createElement('div');
+    card.className='section-card';card.id='sec-'+sec.id;
+    const secUSD=sec.items.reduce((s,i)=>s+toUSD(i.amount,i.cur),0);
+    card.innerHTML=`<div class="sec-hdr" onclick="toggle('${sec.id}')"><div class="sec-left"><span class="sec-icon">${sec.icon}</span>${sec.title}</div><div class="sec-right"><span class="sec-total" id="st-${sec.id}">${fmt(secUSD)}</span><span class="chevron">▼</span></div></div><div class="sec-body">${sec.items.map(item=>{const usd=toUSD(item.amount,item.cur);const local=item.cur!=='USD'?`${item.cur} ${item.amount.toFixed(2)}`:'';const usdColor=item.status==='Estimate'?'#B45309':'#1a1a2e';return`<div class="item"><div><div class="item-cat">${item.cat}</div><div class="item-desc">${item.desc}</div><div class="item-dates">${item.dates}</div>${item.note?`<div class="item-note">${item.note}</div>`:''}</div><div class="item-r"><div class="item-local">${local}</div><div class="item-usd" style="color:${usdColor}" data-id="${sec.id}-${item.cat}">${fmt(usd)}</div><div style="margin-top:5px"><span class="badge ${badgeClass(item.status)}">${item.status.toUpperCase()}</span></div></div></div>`;}).join('')}</div>`;
+    wrap.appendChild(card);
+  });
+}
+function toggle(id){document.getElementById('sec-'+id).classList.toggle('open');}
+function toggleAll(){
+  allOpen=!allOpen;
+  SECTIONS.forEach(s=>{const c=document.getElementById('sec-'+s.id);allOpen?c.classList.add('open'):c.classList.remove('open');});
+  document.getElementById('toggle-all-btn').textContent=allOpen?'▲ Collapse All Sections':'▼ Expand All Sections';
+}
+function recalc(){
+  let confirmed=0,estimated=0;
+  const catTotals={};
+  SECTIONS.forEach(sec=>{
+    let secT=0;
+    sec.items.forEach(item=>{
+      const usd=toUSD(item.amount,item.cur);
+      secT+=usd;
+      if(['Booked','Found','Free'].includes(item.status))confirmed+=usd;else estimated+=usd;
+      const el=document.querySelector(`[data-id="${sec.id}-${item.cat}"]`);
+      if(el)el.textContent=fmt(usd);
+    });
+    catTotals[sec.id]={label:sec.title,icon:sec.icon,color:sec.color,val:secT};
+    const st=document.getElementById('st-'+sec.id);
+    if(st)st.textContent=fmt(secT);
+  });
+  document.getElementById('c-confirmed').textContent=fmt(confirmed);
+  document.getElementById('c-estimated').textContent=fmt(estimated);
+  document.getElementById('c-total').textContent=fmt(confirmed+estimated);
+  updateChart(catTotals);updateBars(catTotals);
+}
+function updateChart(ct){
+  const labels=Object.values(ct).map(v=>v.icon+' '+v.label);
+  const data=Object.values(ct).map(v=>v.val);
+  const colors=Object.values(ct).map(v=>v.color);
+  const total=data.reduce((a,b)=>a+b,0);
+  if(chart){chart.data.labels=labels;chart.data.datasets[0].data=data;chart.data.datasets[0].backgroundColor=colors;chart.update();return;}
+  const ctx=document.getElementById('chart').getContext('2d');
+  chart=new Chart(ctx,{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderWidth:2,borderColor:'#fff'}]},options:{cutout:'62%',plugins:{legend:{position:'bottom',labels:{padding:8,font:{family:'-apple-system,sans-serif',size:11},boxWidth:10,usePointStyle:true}},tooltip:{callbacks:{label:c=>` ${c.label}: ${fmt(c.raw)} (${(c.raw/total*100).toFixed(0)}%)`}}}}});
+}
+function updateBars(ct){
+  const total=Object.values(ct).reduce((s,v)=>s+v.val,0);
+  const wrap=document.getElementById('bars');wrap.innerHTML='';
+  Object.values(ct).forEach(v=>{
+    const pct=total>0?(v.val/total*100).toFixed(1):0;
+    wrap.innerHTML+=`<div class="bar-row"><div class="bar-meta"><span class="bar-name">${v.icon} ${v.label}</span><span class="bar-val">${fmt(v.val)} &nbsp;${pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${v.color}"></div></div></div>`;
+  });
+}
+buildDOM();recalc();toggle('flights');toggle('accom');
+</script>
+</body>
+</html>
